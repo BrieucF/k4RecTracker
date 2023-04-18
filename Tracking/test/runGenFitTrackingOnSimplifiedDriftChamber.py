@@ -128,42 +128,10 @@ dch_digitizer = DCHdigitizer("DCHdigitizer",
     outputDigiHits = dch_reco_hit_name
 )
 
-# convert to licio 
-from Configurables import ToolSvc, EDM4hep2LcioTool
-edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
-edmConvTool.convertAll = False
-edmConvTool.collNameMapping = {
-    "vtxe_reco_hit_name": "VXDTrackerHits"
-}
-edmConvTool.OutputLevel = DEBUG
 
-
-MyConformalTracking = MarlinProcessorWrapper("MyConformalTracking")
-MyConformalTracking.EDM4hep2LcioTool=edmConvTool
-
-MyConformalTracking.OutputLevel = WARNING
-MyConformalTracking.ProcessorType = "ConformalTrackingV2"
-MyConformalTracking.Parameters = {
-                                  "DebugHits": ["DebugHits"],
-                                  "DebugPlots": ["false"],
-                                  "DebugTiming": ["false"],
-                                  "MaxHitInvertedFit": ["0"],
-                                  "MinClustersOnTrackAfterFit": ["3"],
-                                  "RetryTooManyTracks": ["false"],
-                                  "SiTrackCollectionName": ["SiTracksCT"],
-                                  "SortTreeResults": ["true"],
-                                  "Steps": ["[VXDBarrel]", "@Collections", ":", "VXDTrackerHits", "@Parameters", ":", "MaxCellAngle", ":", "0.01;","MaxCellAngleRZ", ":", "0.01;", "Chi2Cut", ":", "100;", "MinClustersOnTrack", ":", "4;","MaxDistance", ":", "0.03;", "SlopeZRange:", "10.0;", "HighPTCut:", "10.0;", "@Flags", ":", "HighPTFit,", "VertexToTracker", "@Functions", ":", "CombineCollections,", "BuildNewTracks"],
-                                  "ThetaRange": ["0.05"],
-                                  "TooManyTracks": ["100000"],
-                                  "TrackerHitCollectionNames": ["VXDTrackerHits"],
-                                  "trackPurity": ["0.7"]
-                                  }
-
-
-# print(MyConformalTracking)
 # run the genfit tracking 
-# from Configurables import GenFitter
-# genfitter = GenFitter("GenFitter", inputHits = dch_reco_hit_name, outputTracks = "genfit_tracks") 
+from Configurables import GenFitter
+genfitter = GenFitter("GenFitter", inputHits = dch_reco_hit_name, outputTracks = "genfit_tracks") 
 
 ################ Output
 from Configurables import PodioOutput
@@ -198,7 +166,7 @@ ApplicationMgr(
               vtxb_digitizer,
               vtxe_digitizer,
               dch_digitizer,
-              MyConformalTracking,
+              genfitter,
               out
               ],
     EvtSel = 'NONE',
